@@ -1,0 +1,11 @@
+.venv/
+node_modules/
+frontend/dist/
+backend/db.sqlite3*
+backend/.local-secret
+__pycache__/
+*.pyc
+.env
+upstream/
+
+*.tsbuildinfo

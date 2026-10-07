@@ -1,0 +1,15 @@
+{
+  "meet": {
+    "repository": "https://github.com/suitenumerique/meet",
+    "commit": "0a6724e7ada25b90fdf24f9dfca40056a0da0ba3",
+    "version": "1.33.0",
+    "license": "MIT",
+    "requires_python": ">=3.13",
+    "local_path": "upstream/meet",
+    "status": "source-pinned-not-deployed"
+  },
+  "docs": {
+    "repository": "https://github.com/suitenumerique/docs",
+    "status": "integration-pending"
+  }
+}
