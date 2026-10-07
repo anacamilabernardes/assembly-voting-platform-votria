@@ -1,6 +1,9 @@
 from django.urls import path
 from governance import api,identity
+from .web import index, readiness
 urlpatterns=[
+    path('',index),
+    path('health/ready',readiness),
     path('health/live',api.liveness),
     path('api/v1/config',identity.bootstrap),
     path('api/v1/auth/demo',identity.demo_login),

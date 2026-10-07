@@ -11,3 +11,13 @@ Data: 7 de outubro de 2026.
 Não executados: PostgreSQL concorrente, testes de carga 8.000, Docker/CI remoto, IdP institucional real, WebAuthn, vídeo Meet/LiveKit, edição Docs, PDF/A, ICP-Brasil, TSA, WORM e homologação RCPJ.
 
 Este relatório se refere ao incremento de simulação, sem aceite de produção.
+
+
+## Preparação para publicação no Render — 07/10/2026
+
+- 47 testes Django passaram em SQLite, incluindo autenticação online por senha, CSRF, cookies seguros, bloqueio oficial, limitação de tentativas e preservação do seed.
+- Compilação final TypeScript/Vite passou, com campo de senha na tela.
+- Roteiro docs/RENDER.md e Blueprint render.yaml preparados para um único serviço Docker mais PostgreSQL.
+- Corrigida sintaxe do corpo da função PL/pgSQL na migration de fatos imutáveis. Isso ainda exige execução em PostgreSQL.
+- Acrescentados à CI testes com PostgreSQL e construção Docker; esses novos jobs ainda não foram executados no GitHub.
+- Não executados localmente: Docker/Linux, PostgreSQL e publicação real no Render. Não existe link público criado por esta preparação.

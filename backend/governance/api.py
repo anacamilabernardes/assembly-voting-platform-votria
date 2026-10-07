@@ -118,7 +118,7 @@ class MinutesView(BaseView):
         return Response(s.minutes(a))
 class InboxView(BaseView):
     def get(self,request):
-        if not settings.DEBUG or not settings.DEMO_MODE:
+        if not settings.DEMO_MODE or request.session.get('authentication_kind') != 'DEMO':
             raise RuleError('DEMO_DISABLED','Caixa de teste indisponível.',403)
         m=self.actor(request)
         rows=MailboxMessage.objects.filter(recipient=m,expires_at__gt=timezone.now()).order_by('-created_at')

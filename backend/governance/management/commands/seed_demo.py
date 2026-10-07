@@ -10,8 +10,8 @@ class Command(BaseCommand):
     help='Cria um simulado com sete associados fictícios; não apaga dados.'
     @transaction.atomic
     def handle(self,*args,**options):
-        if not settings.DEBUG or not settings.DEMO_MODE:
-            raise CommandError('Dados de simulação não podem ser criados em produção.')
+        if not settings.DEMO_MODE:
+            raise CommandError('Dados fictícios exigem modo de simulação explícito.')
         if Assembly.objects.filter(code='SIM-001').exists():
             self.stdout.write('Simulado já existe; histórico preservado.')
             return

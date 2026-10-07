@@ -2,6 +2,10 @@
 
 Primeiro incremento funcional, baseado no [PRD](../PRD_Mensa_Assembleia.md). O módulo de governança usa Django e React e mantém integração com Meet/Docs separada da apuração. Todo dado de demonstração é fictício.
 
+## Publicar um simulado online
+
+Siga o [roteiro do Render](docs/RENDER.md). O arquivo render.yaml cria uma aplicação única com interface, servidor e PostgreSQL. O simulado online exige uma senha de acesso e mantém DEBUG=false, HTTPS e uso oficial bloqueado.
+
 ## Executar localmente
 
 Python 3.12 ou 3.13, Node compatível com Vite 7 e pnpm 11.
@@ -53,4 +57,4 @@ O primeiro incremento ainda não executa Meet, LiveKit ou Docs e não emite toke
 
 Conectar e testar IdP e cadastro reais; WebAuthn e cerimônia de outorga; snapshot aprovado e regras normativas; aprovação dupla da mesa e comandos; motor de matérias especiais; assinatura ICP-Brasil e PDF/A; TSA/WORM e verificador independente; homologação RCPJ; entrega real de e-mail; proteção contra falha sistêmica de presença; pausa/prorrogação/anulação; observabilidade, Kubernetes/DR e CI/CD; testes PostgreSQL de concorrência, acessibilidade, segurança e carga de 8.000.
 
-Não desabilitar o bloqueio de assembleia oficial sem concluir e revisar esses itens. `DEBUG=false` não habilita produção automaticamente: exige segredos, PostgreSQL e desliga login de simulação.
+Não desabilitar o bloqueio de assembleia oficial sem concluir e revisar esses itens. `DEBUG=false` exige segredos e PostgreSQL. O login fictício somente fica disponível online quando MENSA_DEMO_MODE=true e MENSA_DEMO_ACCESS_PASSWORD contém pelo menos 16 caracteres; isso não habilita uso oficial.

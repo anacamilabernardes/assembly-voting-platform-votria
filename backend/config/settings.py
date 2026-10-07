@@ -1,11 +1,13 @@
 import os, secrets
 from pathlib import Path
+from urllib.parse import urlparse, unquote, parse_qs
 from django.core.exceptions import ImproperlyConfigured
 BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = os.getenv('DJANGO_DEBUG', 'true').lower() == 'true'
 DEMO_MODE = os.getenv('MENSA_DEMO_MODE', 'true' if DEBUG else 'false').lower() == 'true'
-if DEMO_MODE and not DEBUG:
-    raise ImproperlyConfigured('Simulação não pode ser habilitada em produção.')
+DEMO_ACCESS_PASSWORD = os.getenv('MENSA_DEMO_ACCESS_PASSWORD', '')
+if DEMO_MODE and not DEBUG and len(DEMO_ACCESS_PASSWORD) < 16:
+    raise ImproperlyConfigured('Simulado online exige MENSA_DEMO_ACCESS_PASSWORD com pelo menos 16 caracteres.')
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 if not SECRET_KEY:
     if not DEBUG:
@@ -15,12 +17,24 @@ if not SECRET_KEY:
         secret_path.write_text(secrets.token_urlsafe(64))
     SECRET_KEY = secret_path.read_text().strip()
 ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1,testserver').split(',')
+RENDER_HOST = os.getenv('RENDER_EXTERNAL_HOSTNAME', '')
+if RENDER_HOST:
+    ALLOWED_HOSTS.append(RENDER_HOST)
 INSTALLED_APPS = ['django.contrib.auth','django.contrib.contenttypes','django.contrib.sessions','django.contrib.staticfiles','rest_framework','governance']
-MIDDLEWARE = ['django.middleware.security.SecurityMiddleware','django.contrib.sessions.middleware.SessionMiddleware','django.middleware.common.CommonMiddleware','django.middleware.csrf.CsrfViewMiddleware','django.contrib.auth.middleware.AuthenticationMiddleware']
+MIDDLEWARE = ['django.middleware.security.SecurityMiddleware','whitenoise.middleware.WhiteNoiseMiddleware','django.contrib.sessions.middleware.SessionMiddleware','django.middleware.common.CommonMiddleware','django.middleware.csrf.CsrfViewMiddleware','django.contrib.auth.middleware.AuthenticationMiddleware','django.middleware.clickjacking.XFrameOptionsMiddleware']
 ROOT_URLCONF = 'config.urls'
 WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {'default': {'ENGINE':'django.db.backends.sqlite3','NAME':BASE_DIR/'db.sqlite3','OPTIONS':{'timeout':20}}}
-if os.getenv('POSTGRES_HOST'):
+if os.getenv('DATABASE_URL'):
+    database_url = urlparse(os.environ['DATABASE_URL'])
+    if database_url.scheme not in ('postgres', 'postgresql') or not database_url.hostname or not database_url.path.strip('/'):
+        raise ImproperlyConfigured('DATABASE_URL deve apontar para um banco PostgreSQL.')
+    database_options = {}
+    sslmode = parse_qs(database_url.query).get('sslmode', [None])[0]
+    if sslmode:
+        database_options['sslmode'] = sslmode
+    DATABASES = {'default': {'ENGINE':'django.db.backends.postgresql', 'HOST':database_url.hostname, 'NAME':unquote(database_url.path[1:]), 'USER':unquote(database_url.username or ''), 'PASSWORD':unquote(database_url.password or ''), 'PORT':database_url.port or 5432, 'CONN_MAX_AGE':60, 'CONN_HEALTH_CHECKS':True, 'OPTIONS':database_options}}
+elif os.getenv('POSTGRES_HOST'):
     DATABASES = {'default':{'ENGINE':'django.db.backends.postgresql','HOST':os.environ['POSTGRES_HOST'],'NAME':os.getenv('POSTGRES_DB','mensa'),'USER':os.getenv('POSTGRES_USER','mensa'),'PASSWORD':os.environ['POSTGRES_PASSWORD'],'PORT':os.getenv('POSTGRES_PORT','5432')}}
 elif not DEBUG:
     raise ImproperlyConfigured('PostgreSQL é obrigatório em produção.')
@@ -28,7 +42,11 @@ REST_FRAMEWORK = {'DEFAULT_AUTHENTICATION_CLASSES':['rest_framework.authenticati
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Sao_Paulo'
 USE_TZ = True
-STATIC_URL = '/static/'
+FRONTEND_DIST = BASE_DIR.parent / 'frontend' / 'dist'
+STATIC_URL = '/assets/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [FRONTEND_DIST / 'assets'] if (FRONTEND_DIST / 'assets').exists() else []
+STORAGES = {'default': {'BACKEND':'django.core.files.storage.FileSystemStorage'}, 'staticfiles': {'BACKEND':'whitenoise.storage.CompressedStaticFilesStorage'}}
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = not DEBUG
@@ -38,6 +56,10 @@ SESSION_COOKIE_AGE = 43200
 SECURE_SSL_REDIRECT = not DEBUG
 SECURE_HSTS_SECONDS = 0 if DEBUG else 31536000
 SECURE_CONTENT_TYPE_NOSNIFF = True
+# Only Render's managed reverse proxy is trusted to supply this header.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') if RENDER_HOST else None
+SECURE_REFERRER_POLICY = 'same-origin'
+X_FRAME_OPTIONS = 'DENY'
 OIDC_ISSUER = os.getenv('OIDC_ISSUER','')
 OIDC_CLIENT_ID = os.getenv('OIDC_CLIENT_ID','')
 OIDC_CLIENT_SECRET = os.getenv('OIDC_CLIENT_SECRET','')
@@ -45,3 +67,5 @@ OIDC_REQUIRED_ACR = os.getenv('OIDC_REQUIRED_ACR','urn:mensa:mfa')
 OIDC_REDIRECT_URI = os.getenv('OIDC_REDIRECT_URI','')
 
 CSRF_TRUSTED_ORIGINS = os.getenv('DJANGO_CSRF_TRUSTED_ORIGINS', 'http://127.0.0.1:5173,http://localhost:5173' if DEBUG else '').split(',') if DEBUG or os.getenv('DJANGO_CSRF_TRUSTED_ORIGINS') else []
+if RENDER_HOST:
+    CSRF_TRUSTED_ORIGINS.append('https://' + RENDER_HOST)
