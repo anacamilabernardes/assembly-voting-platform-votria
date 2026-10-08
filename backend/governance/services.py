@@ -362,3 +362,40 @@ def minutes(a):
         rounds.append({'title':r.agenda_item.title,'proposal':r.proposal_text,'proposal_hash':r.proposal_hash,'result':r.result,'votes':list(r.ballots.values('owner_name','executor_name','choice','protocol'))})
     facts={'kind':'DEMO_MINUTES_NOT_SIGNED','assembly':a.code,'title':a.title,'installation':a.installation,'closed_at':a.closed_at.isoformat(),'rounds':rounds,'presence':[{'name':i.member.full_name,'entered_at':i.entered_at.isoformat(),'exited_at':i.exited_at.isoformat() if i.exited_at else None,'reason':i.reason} for i in PresenceInterval.objects.filter(assembly=a).select_related('member')],'audit_root':a.events.last().event_hash}
     return {'facts':facts,'facts_hash':digest(facts),'notice':'Minuta de simulação. Não é PDF/A, não possui assinatura ICP-Brasil ou carimbo de tempo e não deve ser apresentada ao RCPJ.'}
+
+
+def next_demo_code(assembly_id):
+    # One successor per source assembly, independent of retries or browser tabs.
+    return "SIM-" + uuid.UUID(str(assembly_id)).hex
+
+def start_new_demo(assembly_id, actor, confirmed):
+    with transaction.atomic():
+        source = Assembly.objects.select_for_update().get(pk=assembly_id)
+        ensure_demo(source)
+        regular(source, actor)
+        require_president(source, actor)
+        if source.state != "CLOSED":
+            raise RuleError("DEMO_NOT_CLOSED", "Encerre o simulado atual antes de iniciar outro.")
+        if confirmed is not True:
+            raise RuleError("CONFIRMATION_REQUIRED", "Confirme a criação de um novo simulado.")
+        code = next_demo_code(source.id)
+        successor = Assembly.objects.filter(code=code).first()
+        if successor:
+            return {"assembly_id": str(successor.id), "code": successor.code}
+        electors = list(source.electors.select_related("member"))
+        if not electors or any(e.member.issuer != "demo:local" for e in electors):
+            raise RuleError("DEMO_MEMBERS_REQUIRED", "O novo teste exige somente participantes fictícios.", 403)
+        now = server_time()
+        successor = Assembly.objects.create(
+            code=code, title="Assembleia de demonstração", is_demo=True,
+            president=source.president, secretary=source.secretary,
+            first_call_at=now-timedelta(minutes=40), second_call_at=now-timedelta(minutes=10),
+            snapshot_hash=digest([{"id": str(e.member_id), "name": e.name} for e in electors]))
+        for e in electors:
+            Elector.objects.create(assembly=successor, member=e.member, name=e.name,
+                mb_number=e.mb_number, is_regular=e.is_regular, can_vote=e.can_vote, can_speak=e.can_speak)
+        for item in source.agenda.all():
+            AgendaItem.objects.create(assembly=successor, position=item.position,
+                title=item.title, body=item.body, proposal_hash=item.proposal_hash, rule_kind=item.rule_kind)
+        audit(successor, actor, "demo.created", {"source_assembly_id": str(source.id)}, now)
+        return {"assembly_id": str(successor.id), "code": successor.code}

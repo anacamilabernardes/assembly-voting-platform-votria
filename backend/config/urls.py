@@ -24,6 +24,7 @@ urlpatterns=[
     path('api/v1/assemblies/<uuid:assembly_id>/floor',api.FloorView.as_view()),
     path('api/v1/assemblies/<uuid:assembly_id>/floor/<uuid:floor_id>/decision',api.FloorDecisionView.as_view()),
     path('api/v1/assemblies/<uuid:assembly_id>/close',api.CloseAssemblyView.as_view()),
+    path('api/v1/assemblies/<uuid:assembly_id>/new-demo',api.NewDemoView.as_view()),
     path('api/v1/assemblies/<uuid:assembly_id>/minutes',api.MinutesView.as_view()),
     path('api/v1/demo/inbox',api.InboxView.as_view()),
 ]

@@ -38,7 +38,7 @@ Roteiro para um grupo pequeno:
 5. Ana encerra a votação. Confiram votos nominais, SIM > NÃO, abstenções e resultado.
 6. Ana finaliza a assembleia e baixa a minuta JSON. O resultado é somente de demonstração.
 
-O ensaio usa uma assembleia compartilhada. Votos e histórico não são apagados ao reiniciar ou publicar uma atualização. Após finalizar, não há botão de reiniciar nem reabertura: outro ensaio exige provisionar uma nova assembleia, funcionalidade ainda pendente.
+O ensaio usa uma assembleia compartilhada. Votos e histórico não são apagados ao reiniciar ou publicar uma atualização. Após finalizar, Ana Presidente pode clicar em **Iniciar novo simulado**. O histórico permanece na assembleia anterior. Participantes já conectados são encaminhados ao novo teste pela atualização periódica da tela; se necessário, recarreguem a página. Todos precisam confirmar presença e criar procurações novamente. A senha de acesso permanece a mesma.
 
 ## 4. Compartilhar
 

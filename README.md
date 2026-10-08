@@ -17,7 +17,7 @@ Python 3.12 ou 3.13, Node compatível com Vite 7 e pnpm 11.
 5. Em `frontend`, executar `pnpm install --frozen-lockfile` e `pnpm dev`.
 6. Abrir http://127.0.0.1:5173.
 
-O seed é idempotente e não apaga histórico. O simulado não se reinicia automaticamente. Para outro ensaio, criar outro banco ou uma nova assembleia por procedimento de desenvolvimento; não apagar votos ou eventos em um banco existente.
+O seed é idempotente e não apaga histórico. Após encerrar, Ana Presidente pode clicar em **Iniciar novo simulado**. O grupo recebe uma nova assembleia com os mesmos perfis e pautas, sem votos, presença ou procurações do teste anterior.
 
 Opcional: `docker compose up --build` cria backend e PostgreSQL de desenvolvimento; definir previamente DJANGO_SECRET_KEY e POSTGRES_PASSWORD com valores aleatórios. O frontend continua iniciado separadamente. Este compose ainda precisa ser validado em ambiente com Docker e não é implantação de produção.
 

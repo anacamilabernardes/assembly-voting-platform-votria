@@ -46,10 +46,14 @@ class MeView(BaseView):
         return Response({'id':str(m.id),'name':m.full_name,'email':m.email,'mb':m.mb_number,'authentication_kind':request.session.get('authentication_kind','UNKNOWN')})
 class AssemblyListView(BaseView):
     def get(self,request):
-        return Response(list(Assembly.objects.filter(electors__member=self.actor(request)).values('id','title','code','state','is_demo')))
+        return Response(list(Assembly.objects.filter(electors__member=self.actor(request)).order_by('-first_call_at','-id').values('id','title','code','state','is_demo')))
 class StateView(BaseView):
     def get(self,request,assembly_id):
-        return Response(s.state(assembly_id,self.actor(request),request.session.session_key))
+        actor=self.actor(request)
+        data=s.state(assembly_id,actor,request.session.session_key)
+        successor=Assembly.objects.filter(code=s.next_demo_code(assembly_id),is_demo=True,electors__member=actor).first() if data['state']=='CLOSED' else None
+        data['next_demo_id']=str(successor.id) if successor else None
+        return Response(data)
 class PresenceView(BaseView):
     def post(self,request,assembly_id,action):
         if action=='check-in':
@@ -121,5 +125,18 @@ class InboxView(BaseView):
         if not settings.DEMO_MODE or request.session.get('authentication_kind') != 'DEMO':
             raise RuleError('DEMO_DISABLED','Caixa de teste indisponível.',403)
         m=self.actor(request)
-        rows=MailboxMessage.objects.filter(recipient=m,expires_at__gt=timezone.now()).order_by('-created_at')
+        rows=MailboxMessage.objects.filter(recipient=m,expires_at__gt=timezone.now())
+        if request.query_params.get('assembly_id'):
+            assembly_id=serializers.UUIDField().run_validation(request.query_params['assembly_id'])
+            assembly=Assembly.objects.get(pk=assembly_id,electors__member=m)
+            s.ensure_demo(assembly)
+            rows=rows.filter(assembly=assembly)
+        rows=rows.order_by('-created_at')
         return Response([{'id':str(r.id),'subject':r.subject,'code':s.mailbox_cipher().decrypt(r.ciphertext.encode()).decode(),'notice':'Caixa local fictícia: o código está disponível apenas ao outorgante.'} for r in rows])
+
+class NewDemoView(BaseView):
+    def post(self,request,assembly_id):
+        if request.session.get("authentication_kind") != "DEMO":
+            raise RuleError("DEMO_LOGIN_REQUIRED", "Entre com um perfil fictício para iniciar outro teste.", 403)
+        payload=parse(request,{"confirmed":serializers.BooleanField()})
+        return Response(s.start_new_demo(assembly_id,self.actor(request),payload["confirmed"]))
