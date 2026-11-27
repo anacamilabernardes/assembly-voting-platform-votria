@@ -4,10 +4,10 @@ from urllib.parse import urlparse, unquote, parse_qs
 from django.core.exceptions import ImproperlyConfigured
 BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = os.getenv('DJANGO_DEBUG', 'true').lower() == 'true'
-DEMO_MODE = os.getenv('MENSA_DEMO_MODE', 'true' if DEBUG else 'false').lower() == 'true'
-DEMO_ACCESS_PASSWORD = os.getenv('MENSA_DEMO_ACCESS_PASSWORD', '')
+DEMO_MODE = os.getenv('VOTRIA_DEMO_MODE', 'true' if DEBUG else 'false').lower() == 'true'
+DEMO_ACCESS_PASSWORD = os.getenv('VOTRIA_DEMO_ACCESS_PASSWORD', '')
 if DEMO_MODE and not DEBUG and len(DEMO_ACCESS_PASSWORD) < 16:
-    raise ImproperlyConfigured('Simulado online exige MENSA_DEMO_ACCESS_PASSWORD com pelo menos 16 caracteres.')
+    raise ImproperlyConfigured('Online demo requires VOTRIA_DEMO_ACCESS_PASSWORD to contain at least 16 characters.')
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 if not SECRET_KEY:
     if not DEBUG:
@@ -35,7 +35,7 @@ if os.getenv('DATABASE_URL'):
         database_options['sslmode'] = sslmode
     DATABASES = {'default': {'ENGINE':'django.db.backends.postgresql', 'HOST':database_url.hostname, 'NAME':unquote(database_url.path[1:]), 'USER':unquote(database_url.username or ''), 'PASSWORD':unquote(database_url.password or ''), 'PORT':database_url.port or 5432, 'CONN_MAX_AGE':60, 'CONN_HEALTH_CHECKS':True, 'OPTIONS':database_options}}
 elif os.getenv('POSTGRES_HOST'):
-    DATABASES = {'default':{'ENGINE':'django.db.backends.postgresql','HOST':os.environ['POSTGRES_HOST'],'NAME':os.getenv('POSTGRES_DB','mensa'),'USER':os.getenv('POSTGRES_USER','mensa'),'PASSWORD':os.environ['POSTGRES_PASSWORD'],'PORT':os.getenv('POSTGRES_PORT','5432')}}
+    DATABASES = {'default':{'ENGINE':'django.db.backends.postgresql','HOST':os.environ['POSTGRES_HOST'],'NAME':os.getenv('POSTGRES_DB','votria'),'USER':os.getenv('POSTGRES_USER','votria'),'PASSWORD':os.environ['POSTGRES_PASSWORD'],'PORT':os.getenv('POSTGRES_PORT','5432')}}
 elif not DEBUG:
     raise ImproperlyConfigured('PostgreSQL é obrigatório em produção.')
 REST_FRAMEWORK = {'DEFAULT_AUTHENTICATION_CLASSES':['rest_framework.authentication.SessionAuthentication'],'DEFAULT_PERMISSION_CLASSES':['rest_framework.permissions.IsAuthenticated'],'EXCEPTION_HANDLER':'governance.api.exception_handler'}
@@ -63,7 +63,8 @@ X_FRAME_OPTIONS = 'DENY'
 OIDC_ISSUER = os.getenv('OIDC_ISSUER','')
 OIDC_CLIENT_ID = os.getenv('OIDC_CLIENT_ID','')
 OIDC_CLIENT_SECRET = os.getenv('OIDC_CLIENT_SECRET','')
-OIDC_REQUIRED_ACR = os.getenv('OIDC_REQUIRED_ACR','urn:mensa:mfa')
+OIDC_REQUIRED_ACR = os.getenv('VOTRIA_REQUIRED_ACR','')
+VOTRIA_ALLOWED_EMAIL_DOMAIN = os.getenv('VOTRIA_ALLOWED_EMAIL_DOMAIN','').strip().lower().lstrip('@')
 OIDC_REDIRECT_URI = os.getenv('OIDC_REDIRECT_URI','')
 
 CSRF_TRUSTED_ORIGINS = os.getenv('DJANGO_CSRF_TRUSTED_ORIGINS', 'http://127.0.0.1:5173,http://localhost:5173' if DEBUG else '').split(',') if DEBUG or os.getenv('DJANGO_CSRF_TRUSTED_ORIGINS') else []

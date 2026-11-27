@@ -6,7 +6,7 @@ This configuration publishes a simulation with seven fictional participants and 
 
 In GitHub Desktop, commit the changes and select **Push origin**. If the repository has not yet been published, choose **Publish repository**.
 
-On the repository page, confirm that `render.yaml`, `Dockerfile`, and `deploy/start.sh` are at the repository root. The expected root is the application folder, with `backend` and `frontend` directly beneath it, not the entire Visao project folder.
+On the repository page, confirm that `render.yaml`, `Dockerfile`, and `deploy/start.sh` are at the repository root. The expected root is the application folder, with `backend` and `frontend` directly beneath it, not the entire parent workspace folder.
 
 ## 2. Create the service from the Blueprint
 

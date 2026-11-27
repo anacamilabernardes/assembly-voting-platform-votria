@@ -7,10 +7,11 @@ class RuleError(Exception):
     status: int = 409
 def digest(value):
     return hashlib.sha256(json.dumps(value,sort_keys=True,ensure_ascii=False,separators=(',',':'),allow_nan=False).encode()).hexdigest()
-def institutional_email(email):
+def institutional_email(email, allowed_domain):
     value = email.strip().lower()
-    if value.count('@') != 1 or value.split('@')[1] != 'mensa.org.br':
-        raise RuleError('DOMAIN_NOT_ALLOWED','Use sua conta pessoal @mensa.org.br.',403)
+    domain = allowed_domain.strip().lower().lstrip('@')
+    if value.count('@') != 1 or not domain or value.split('@')[1] != domain:
+        raise RuleError('DOMAIN_NOT_ALLOWED','Use an account from the configured institutional email domain.',403)
     return value
 def token_hash(code,secret):
     return hmac.new(secret.encode(),code.strip().encode(),hashlib.sha256).hexdigest()

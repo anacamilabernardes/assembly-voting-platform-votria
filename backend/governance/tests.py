@@ -21,10 +21,12 @@ class RulesTests(SimpleTestCase):
         self.assertEqual(quorum_required(8000),5334)
         self.assertEqual(quorum_required(7),5)
     def test_exact_domain(self):
-        self.assertEqual(institutional_email(' A@MENSA.ORG.BR '),'a@mensa.org.br')
-        for email in ('a@gmail.com','a@mensa.org.br.evil.org','a@sub.mensa.org.br'):
+        self.assertEqual(institutional_email(' A@EXAMPLE.ORG ','example.org'),'a@example.org')
+        for email in ('a@gmail.com','a@example.org.evil.org','a@sub.example.org'):
             with self.assertRaises(RuleError):
-                institutional_email(email)
+                institutional_email(email,'example.org')
+        with self.assertRaises(RuleError):
+            institutional_email('a@example.org','')
 @override_settings(DEBUG=True,DEMO_MODE=True)
 class GovernanceTests(TestCase):
     def setUp(self):
@@ -174,7 +176,7 @@ class GovernanceTests(TestCase):
         self.enter(self.p);self.leave(self.p)
         previous=''
         for e in self.a.events.all():
-            envelope={'assembly':str(self.a.id),'actor':str(e.actor_id) if e.actor_id else None,'sequence':e.sequence,'action':e.action,'payload':e.payload,'occurred_at':e.occurred_at.isoformat(),'previous_hash':previous,'schema':'mensa-json-v1'}
+            envelope={'assembly':str(self.a.id),'actor':str(e.actor_id) if e.actor_id else None,'sequence':e.sequence,'action':e.action,'payload':e.payload,'occurred_at':e.occurred_at.isoformat(),'previous_hash':previous,'schema':'votria-json-v1'}
             self.assertEqual(e.previous_hash,previous)
             self.assertEqual(e.event_hash,digest(envelope));previous=e.event_hash
         with self.assertRaises(DatabaseError),transaction.atomic():

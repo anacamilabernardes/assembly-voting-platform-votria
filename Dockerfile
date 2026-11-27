@@ -14,8 +14,8 @@ RUN pip install --no-cache-dir -r /app/backend/requirements.txt
 COPY backend/ /app/backend/
 COPY --from=frontend /build/dist /app/frontend/dist
 COPY deploy/start.sh /app/deploy/start.sh
-RUN DJANGO_DEBUG=true MENSA_DEMO_MODE=false DJANGO_SECRET_KEY=build-only-placeholder python backend/manage.py collectstatic --noinput \
-    && useradd --uid 10001 --create-home mensa
-USER mensa
+RUN DJANGO_DEBUG=true VOTRIA_DEMO_MODE=false DJANGO_SECRET_KEY=build-only-placeholder python backend/manage.py collectstatic --noinput \
+    && useradd --uid 10001 --create-home votria
+USER votria
 EXPOSE 10000
 CMD ["sh", "/app/deploy/start.sh"]

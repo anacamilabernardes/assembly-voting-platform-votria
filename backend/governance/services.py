@@ -21,7 +21,7 @@ def audit(a,actor,action,payload,now):
     last = a.events.order_by('-sequence').first()
     previous = last.event_hash if last else ''
     seq = last.sequence+1 if last else 1
-    envelope = {'assembly':str(a.id),'actor':str(actor.id) if actor else None,'sequence':seq,'action':action,'payload':payload,'occurred_at':now.isoformat(),'previous_hash':previous,'schema':'mensa-json-v1'}
+    envelope = {'assembly':str(a.id),'actor':str(actor.id) if actor else None,'sequence':seq,'action':action,'payload':payload,'occurred_at':now.isoformat(),'previous_hash':previous,'schema':'votria-json-v1'}
     return AuditEvent.objects.create(assembly=a,actor=actor,sequence=seq,action=action,payload=payload,occurred_at=now,previous_hash=previous,event_hash=digest(envelope))
 
 def elector(a,member):

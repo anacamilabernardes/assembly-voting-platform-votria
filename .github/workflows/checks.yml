@@ -10,18 +10,18 @@ jobs:
       postgres:
         image: postgres:17
         env:
-          POSTGRES_DB: mensa
-          POSTGRES_USER: mensa
+          POSTGRES_DB: votria
+          POSTGRES_USER: votria
           POSTGRES_PASSWORD: ci-only-password
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U mensa"
+          --health-cmd "pg_isready -U votria"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
     env:
-      DATABASE_URL: ${{ matrix.database == 'postgres' && 'postgresql://mensa:ci-only-password@localhost:5432/mensa' || '' }}
+      DATABASE_URL: ${{ matrix.database == 'postgres' && 'postgresql://votria:ci-only-password@localhost:5432/votria' || '' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -48,4 +48,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: docker build --tag mensa-demo .
+      - run: docker build --tag votria-demo .

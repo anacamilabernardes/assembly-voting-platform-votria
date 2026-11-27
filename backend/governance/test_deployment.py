@@ -107,8 +107,8 @@ class OnlineDemoTests(TestCase):
 class DeploymentSettingsTests(SimpleTestCase):
     def settings(self, **extra):
         env={"DJANGO_DEBUG":"false","DJANGO_SECRET_KEY":"config-test-secret",
-             "MENSA_DEMO_MODE":"true","MENSA_DEMO_ACCESS_PASSWORD":PASSWORD,
-             "DATABASE_URL":"postgresql://mensa:p%40ss@db.internal:5432/mensa?sslmode=require",
+             "VOTRIA_DEMO_MODE":"true","VOTRIA_DEMO_ACCESS_PASSWORD":PASSWORD,
+             "DATABASE_URL":"postgresql://votria:p%40ss@db.internal:5432/votria?sslmode=require",
              "RENDER_EXTERNAL_HOSTNAME":"demo.onrender.com"}
         env.update(extra)
         with patch.dict(os.environ,env,clear=True):
@@ -127,7 +127,7 @@ class DeploymentSettingsTests(SimpleTestCase):
     def test_missing_or_short_online_password_fails_closed(self):
         for password in ("","curta"):
             with self.assertRaises(ImproperlyConfigured):
-                self.settings(MENSA_DEMO_ACCESS_PASSWORD=password)
+                self.settings(VOTRIA_DEMO_ACCESS_PASSWORD=password)
 
     def test_online_requires_postgresql(self):
         with self.assertRaises(ImproperlyConfigured):

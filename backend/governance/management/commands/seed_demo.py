@@ -18,7 +18,7 @@ class Command(BaseCommand):
         names=['Ana Presidente','Bruno Secretário','Carla Associada','Diego Associado','Elisa Associada','Felipe Associado','Gabriela Associada']
         members=[]
         for i,name in enumerate(names):
-            email='simulado'+str(i+1)+'@mensa.org.br'
+            email='participant'+str(i+1)+'@demo.votria.test'
             u,created=User.objects.get_or_create(username=email,defaults={'email':email})
             if created:
                 u.set_unusable_password();u.save()
