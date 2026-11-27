@@ -1,25 +1,25 @@
-# Backlog de implementação
+# Implementation Backlog
 
-## Incremento 1 entregue
+## Increment 1 delivered
 
-Núcleo persistente e interface de simulação do fluxo assembleia, presença, procuração, pauta, voto nominal, pedido de palavra e minuta. Migrations e testes automatizados do comportamento implementado.
+Persistent core and simulation interface for assembly, attendance, proxy authorization, agenda items, roll-call voting, speaking requests, and draft minutes. Includes migrations and automated tests for implemented behavior.
 
-## Incremento 2 identidade e provas
+## Increment 2: identity and evidence
 
-Vincular cadastro e IdP institucional, implementar cerimônia WebAuthn, instrumentos preparados e assinados, SMTP/outbox cifrada e confirmação ao outorgante. Homologar login em ambiente real; não aceitar email ou MFA autodeclarados por header.
+Connect the member registry and institutional identity provider; implement WebAuthn ceremonies, prepared and signed instruments, encrypted SMTP/outbox delivery, and confirmation to the grantor. Validate sign-in in a real environment. Do not accept email or MFA claims supplied through self-declared headers.
 
-## Incremento 3 governança completa
+## Increment 3: complete governance
 
-Snapshot aprovado/versionado, edital e preparação de assembleia pela mesa, regras especiais declarativas, pausa/prorrogação/anulação, reconciliação de incidentes e controle independente de comandos. Aprovação dupla e contestação conforme PRD.
+Add an approved and versioned snapshot, notice and meeting preparation by the board, declarative special-motion rules, pause/extension/annulment flows, incident reconciliation, and independent command controls. Implement dual approval and challenges as specified in the product requirements.
 
-## Incremento 4 La Suite
+## Increment 4: meeting and document integrations
 
-Fork de UI do Meet, IdP compartilhado, tokens e permissões LiveKit, palco/audiência privada, adaptação do Docs e edição controlada de ata. Fixar commit Docs e validar APIs de ambos.
+Add a meeting UI fork, shared identity provider, LiveKit tokens and permissions, private speaker stage and audience, document integration, and controlled minutes editing. Pin the document-service commit and validate both APIs.
 
-## Incremento 5 evidência registral
+## Increment 5: registry-grade evidence
 
-PDF/A, ICP-Brasil da mesa, carimbo RFC 3161, manifesto canonicalizado, WORM, verificador offline, circulação/objeções/aprovação e perfil RCPJ homologado. A prova interna mensa-json-v1 não substitui essas exigências.
+Add PDF/A, board signatures using ICP-Brasil, RFC 3161 timestamps, a canonicalized manifest, WORM storage, an offline verifier, circulation/objections/approval, and a validated registry profile. The current internal JSON proof format does not meet these requirements.
 
-## Incremento 6 operação
+## Increment 6: operations
 
-PostgreSQL HA, barreiras eficientes, outbox e gateway, Kubernetes, métricas, DR, CI/CD, testes de corrida, pentest, carga de 8.000, simulado associativo e aceite de produção.
+Add PostgreSQL high availability, efficient barriers, an outbox and gateway, Kubernetes, metrics, disaster recovery, CI/CD, race-condition testing, penetration testing, load testing for 8,000 participants, an association-wide simulation, and production acceptance.
