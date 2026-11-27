@@ -1,11 +1,12 @@
-name: votria-assembleia-dev
+# Local development stack: PostgreSQL plus the same image that Render runs (interface + API).
+name: votria-dev
 services:
   postgres:
     image: postgres:17-alpine
     environment:
       POSTGRES_DB: votria
       POSTGRES_USER: votria
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD no ambiente}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -13,18 +14,22 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
-  backend:
-    build: ./backend
+  app:
+    build: .
     environment:
+      PORT: "8000"
       DJANGO_DEBUG: "true"
       VOTRIA_DEMO_MODE: "true"
-      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?Defina DJANGO_SECRET_KEY no ambiente}
+      VOTRIA_DEMO_ACCESS_PASSWORD: ${VOTRIA_DEMO_ACCESS_PASSWORD:?Set VOTRIA_DEMO_ACCESS_PASSWORD (16+ characters)}
+      VOTRIA_INSTITUTION_NAME: ${VOTRIA_INSTITUTION_NAME:-}
+      VOTRIA_ALLOWED_EMAIL_DOMAIN: ${VOTRIA_ALLOWED_EMAIL_DOMAIN:-}
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?Set DJANGO_SECRET_KEY}
+      DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1
+      DJANGO_CSRF_TRUSTED_ORIGINS: http://localhost:8000,http://127.0.0.1:8000
       POSTGRES_HOST: postgres
       POSTGRES_DB: votria
       POSTGRES_USER: votria
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1,backend
-    command: ["sh","-c","python manage.py migrate && python manage.py seed_demo && gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3"]
     ports:
       - "127.0.0.1:8000:8000"
     depends_on:

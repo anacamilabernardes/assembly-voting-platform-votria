@@ -1,10 +1,10 @@
 # Publish the Demo on Render
 
-This configuration publishes a simulation with seven fictional participants and has no registry or legal validity. Meeting, document, and real institutional sign-in integrations are not connected. The environment has not been validated for 8,000 participants.
+This configuration publishes a simulation with seven fictional participants and five agenda items (roll-call, secret ballot, an election with two slates and a blocked special matter). It has no registry or legal validity. Meeting, document, and real institutional sign-in integrations are not connected. The environment has not been validated for 8,000 participants.
 
 ## 1. Push the changes to GitHub
 
-In GitHub Desktop, commit the changes and select **Push origin**. If the repository has not yet been published, choose **Publish repository**.
+Commit your changes and push them to the `main` branch on GitHub.
 
 On the repository page, confirm that `render.yaml`, `Dockerfile`, and `deploy/start.sh` are at the repository root. The expected root is the application folder, with `backend` and `frontend` directly beneath it, not the entire parent workspace folder.
 
@@ -23,6 +23,8 @@ On the repository page, confirm that `render.yaml`, `Dockerfile`, and `deploy/st
 The deployment generates a random internal key, connects to the database over the private network, builds the interface, and applies migrations. On startup, it loads fictional data only when the data does not already exist. No manual commands or separate website configuration are needed.
 
 Do not select a paid plan without checking the displayed price. Plan names and availability can change; if Free is unavailable, review the selection before confirming.
+
+After the first start, run `python manage.py verify_audit` from the Render shell at any time to check the audit chains, and schedule `python manage.py apply_retention` (for example, monthly) to purge operational data.
 
 ## 3. Open and test
 

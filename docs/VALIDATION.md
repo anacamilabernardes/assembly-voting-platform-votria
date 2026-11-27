@@ -1,4 +1,14 @@
-# Validation of Increment 0.1
+# Validation record
+
+## Product prototype (0.2.0) — November 26, 2026
+
+- 84 Django tests passed on SQLite, including secret ballots (choice never stored with the voter, in receipts, audit events or idempotency records), elections with ties and blank votes, CSV import with line-level errors, assembly drafting and publication, isolation between organizations, audit-chain verification, data retention, printable minutes and the Content-Security-Policy header.
+- 7 Playwright end-to-end tests passed in Chrome against Django serving the built interface: roll-call vote, secret ballot with two participants, slate election, printable minutes, building and publishing an assembly as administrator, switching to English, and no console errors or CSP violations.
+- ruff, ESLint and Prettier passed; the TypeScript build passed.
+- Not run locally: PostgreSQL, the Docker build and CodeQL. They run in GitHub Actions on every push.
+- Not run: real identity provider, WebAuthn, load testing, accessibility audit, penetration test, legal review.
+
+## Increment 0.1
 
 Date: October 7, 2026.
 

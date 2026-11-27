@@ -1,0 +1,14 @@
+[tool.ruff]
+target-version = "py312"
+line-length = 110
+extend-exclude = ["backend/governance/migrations/0001_initial.py"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = ["E501", "B904"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["config", "governance"]
+
+[tool.ruff.format]
+quote-style = "single"

@@ -10,3 +10,6 @@ upstream/
 
 *.tsbuildinfo
 backend/staticfiles/
+backend/e2e.sqlite3*
+frontend/playwright-report/
+frontend/test-results/

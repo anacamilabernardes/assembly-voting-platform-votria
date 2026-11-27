@@ -1,11 +1,16 @@
 # Changelog
 
-## Unreleased
+## 0.2.0 — Unreleased
 
-- Added `VOTRIA_INSTITUTION_NAME`, shown on the sign-in screen.
-- Fictional demo accounts now use the configured institutional email domain, and the demo sign-in checks that domain.
-- An invalid `VOTRIA_ALLOWED_EMAIL_DOMAIN` now stops startup with a clear error.
-- The Render Blueprint asks for the institution name and email domain of each deployment.
+Product prototype for any member institution.
+
+- Organizations with their own email domain, administrators and members; data never crosses organizations.
+- Administration: CSV member import with line-level errors, assembly drafts, agenda building with roll-call, secret or election items, and publication that freezes the electorate.
+- Secret ballots stored apart from voters, and elections with candidates or slates (plurality, ties elect no one, blank votes counted apart).
+- Printable HTML minutes, `verify_audit` and `apply_retention` commands, privacy notice.
+- Interface split into components, typed API, Portuguese and English.
+- Institutional sign-in resolves the organization by email domain and binds the identity on first sign-in.
+- Content-Security-Policy, self-hosted fonts, single Dockerfile, ruff, ESLint, Prettier, Playwright end-to-end tests, CodeQL and Dependabot.
 
 ## 0.1.0 — 2026-11-26
 

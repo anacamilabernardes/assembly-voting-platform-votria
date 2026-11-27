@@ -8,7 +8,8 @@ Follow the local setup in the [README](README.md). Before opening a pull request
 
 ```sh
 python backend/manage.py test governance --verbosity 2
-cd frontend && pnpm build
+ruff check backend && ruff format --check backend
+cd frontend && pnpm lint && pnpm build && pnpm e2e
 ```
 
 The local SQLite database is intended for sequential development and tests. Database concurrency changes should also be checked in PostgreSQL through the configured CI workflow.
@@ -26,6 +27,8 @@ The local SQLite database is intended for sequential development and tests. Data
 
 - Authorization and domain rules are enforced by the backend.
 - Vote and audit immutability and idempotency remain intact.
+- Secret-ballot choices never appear next to a voter: not in receipts, audit payloads, idempotency records or logs.
+- Data stays within its organization.
 - Any new environment variables are documented in `.env.example`.
 - UI changes remain clear about demo-only behavior.
 - CI checks pass.
