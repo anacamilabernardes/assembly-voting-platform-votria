@@ -228,6 +228,9 @@ class AdministrationTests(ProductTestCase):
         a.refresh_from_db()
         self.assertEqual(a.state, 'PUBLISHED')
         self.assertFalse(Elector.objects.get(assembly=a, member__mb_number='N-2').can_vote)
+        self.assertEqual(
+            a.electors.filter(is_regular=True).count(), self.org.members.filter(can_vote=True).count()
+        )
         self.enter(self.p, assembly=a)
         self.cmd(self.p, lambda x, t: s.install(x, self.p, 2, t), assembly=a)
         election = a.agenda.get(position=2)

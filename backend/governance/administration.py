@@ -299,6 +299,8 @@ def publish_assembly(actor, assembly_id):
             member=m,
             name=m.full_name,
             mb_number=m.mb_number,
+            # Quorum counts regular electors, so members without voting rights are not regular here.
+            is_regular=m.can_vote,
             can_vote=m.can_vote,
             can_speak=m.can_speak,
         )
