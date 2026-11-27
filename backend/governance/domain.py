@@ -13,6 +13,12 @@ def institutional_email(email, allowed_domain):
     if value.count('@') != 1 or not domain or value.split('@')[1] != domain:
         raise RuleError('DOMAIN_NOT_ALLOWED','Use an account from the configured institutional email domain.',403)
     return value
+DEFAULT_DEMO_EMAIL_DOMAIN = 'demo.votria.test'
+def demo_email_domain(configured_domain):
+    # Fictional demo accounts follow the deployment's institutional domain when one is configured.
+    return configured_domain.strip().lower().lstrip('@') or DEFAULT_DEMO_EMAIL_DOMAIN
+def demo_email(number, configured_domain):
+    return f'demo-participant-{number}@{demo_email_domain(configured_domain)}'
 def token_hash(code,secret):
     return hmac.new(secret.encode(),code.strip().encode(),hashlib.sha256).hexdigest()
 def ordinary_result(choices):

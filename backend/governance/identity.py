@@ -10,7 +10,7 @@ from django.views.decorators.http import require_POST,require_GET
 from authlib.integrations.django_client import OAuth
 from authlib.integrations.base_client.errors import OAuthError
 from .models import Member,Assembly
-from .domain import institutional_email,RuleError
+from .domain import institutional_email,demo_email_domain,RuleError
 from .services import command,check_out
 oauth=OAuth()
 OIDC_READY=bool(settings.OIDC_ISSUER and settings.OIDC_CLIENT_ID and settings.OIDC_CLIENT_SECRET and settings.OIDC_REDIRECT_URI and settings.OIDC_REQUIRED_ACR and settings.VOTRIA_ALLOWED_EMAIL_DOMAIN)
@@ -24,7 +24,7 @@ def demo_available(request):
 @require_GET
 def bootstrap(request):
     demo=demo_available(request)
-    return JsonResponse({'demo':demo,'demo_password_required':bool(settings.DEMO_ACCESS_PASSWORD),'official_ready':False,'oidc_configured':OIDC_READY,'institutional_domain':settings.VOTRIA_ALLOWED_EMAIL_DOMAIN,'demo_accounts':[{'id':str(m.id),'name':m.full_name,'email':m.email} for m in Member.objects.filter(issuer='demo:local')] if demo else []})
+    return JsonResponse({'demo':demo,'demo_password_required':bool(settings.DEMO_ACCESS_PASSWORD),'official_ready':False,'oidc_configured':OIDC_READY,'institution_name':settings.VOTRIA_INSTITUTION_NAME,'institutional_domain':settings.VOTRIA_ALLOWED_EMAIL_DOMAIN,'demo_accounts':[{'id':str(m.id),'name':m.full_name,'email':m.email} for m in Member.objects.filter(issuer='demo:local')] if demo else []})
 def leave_current_session(request):
     if request.user.is_authenticated and hasattr(request.user,'member'):
         actor=request.user.member
@@ -51,6 +51,7 @@ def demo_login(request):
                 return JsonResponse({'code':'DEMO_ACCESS_DENIED','detail':'Senha de acesso ao simulado inválida.'},status=403)
             cache.delete(limit_key)
         m=Member.objects.get(pk=body['member_id'],issuer='demo:local',user__is_active=True)
+        institutional_email(m.email,demo_email_domain(settings.VOTRIA_ALLOWED_EMAIL_DOMAIN))
     except (ValueError,KeyError,ValidationError,Member.DoesNotExist,RuleError):
         return JsonResponse({'code':'INVALID_ACCOUNT','detail':'Conta de simulação inválida.'},status=400)
     leave_current_session(request)

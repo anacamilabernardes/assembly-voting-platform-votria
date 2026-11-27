@@ -5,20 +5,22 @@ from django.core.management.base import BaseCommand,CommandError
 from django.db import transaction
 from django.utils import timezone
 from governance.models import Member,Assembly,Elector,AgendaItem
-from governance.domain import digest
+from governance.domain import digest,demo_email
 class Command(BaseCommand):
     help='Cria um simulado com sete associados fictícios; não apaga dados.'
     @transaction.atomic
     def handle(self,*args,**options):
         if not settings.DEMO_MODE:
             raise CommandError('Dados fictícios exigem modo de simulação explícito.')
+        domain=settings.VOTRIA_ALLOWED_EMAIL_DOMAIN
+        self.sync_demo_emails(domain)
         if Assembly.objects.filter(code='SIM-001').exists():
             self.stdout.write('Simulado já existe; histórico preservado.')
             return
         names=['Ana Presidente','Bruno Secretário','Carla Associada','Diego Associado','Elisa Associada','Felipe Associado','Gabriela Associada']
         members=[]
         for i,name in enumerate(names):
-            email='participant'+str(i+1)+'@demo.votria.test'
+            email=demo_email(i+1,domain)
             u,created=User.objects.get_or_create(username=email,defaults={'email':email})
             if created:
                 u.set_unusable_password();u.save()
@@ -32,3 +34,17 @@ class Command(BaseCommand):
         for i,(title,body) in enumerate(proposals,1):
             AgendaItem.objects.create(assembly=a,position=i,title=title,body=body,proposal_hash=digest({'text':body}),rule_kind='SPECIAL' if i==3 else 'SIMPLE')
         self.stdout.write('Simulado criado com sete associados fictícios.')
+
+    def sync_demo_emails(self,domain):
+        # Keeps fictional accounts on the institution's domain after the deployment setting changes.
+        for m in Member.objects.filter(issuer='demo:local').select_related('user'):
+            email=demo_email(m.subject,domain)
+            if m.email==email:
+                continue
+            if Member.objects.filter(email=email).exclude(pk=m.pk).exists() or User.objects.filter(username=email).exclude(pk=m.user_id).exists():
+                raise CommandError(f'O endereço fictício {email} já pertence a outra conta.')
+            m.email=email
+            m.save(update_fields=['email'])
+            m.user.username=email
+            m.user.email=email
+            m.user.save(update_fields=['username','email'])

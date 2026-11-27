@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Added `VOTRIA_INSTITUTION_NAME`, shown on the sign-in screen.
+- Fictional demo accounts now use the configured institutional email domain, and the demo sign-in checks that domain.
+- An invalid `VOTRIA_ALLOWED_EMAIL_DOMAIN` now stops startup with a clear error.
+- The Render Blueprint asks for the institution name and email domain of each deployment.
+
 ## 0.1.0 — 2026-11-26
 
 Initial public prototype release.

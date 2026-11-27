@@ -56,7 +56,19 @@ Requirements: Python 3.12 or 3.13, Node.js compatible with Vite 7, and pnpm 11.
 
 Optional: `docker compose up --build` starts the development backend and PostgreSQL. Set random values for `DJANGO_SECRET_KEY` and `POSTGRES_PASSWORD` first. The frontend must still be started separately. This compose setup is for development, not production.
 
-To configure an institutional identity provider, set `VOTRIA_ALLOWED_EMAIL_DOMAIN`, `VOTRIA_REQUIRED_ACR`, and the OIDC settings in `.env`. The demo login uses the `VOTRIA_DEMO_MODE` and `VOTRIA_DEMO_ACCESS_PASSWORD` environment variables. Never commit secrets.
+## Configure the institution
+
+Each deployment serves one institution. Set these values in `.env` (or in the hosting provider's environment settings):
+
+| Variable | Purpose | Example |
+| --- | --- | --- |
+| `VOTRIA_INSTITUTION_NAME` | Name shown on the sign-in screen | `Example Association` |
+| `VOTRIA_ALLOWED_EMAIL_DOMAIN` | The only email domain accepted at sign-in; exact match, no subdomains | `example.org` |
+| `VOTRIA_REQUIRED_ACR` | Authentication assurance level the identity provider must report | Provided by the institution |
+
+Fictional demo accounts are created as `demo-participant-N@<domain>`. Without a configured domain they use `demo.votria.test`. If the domain changes, running `seed_demo` again (it runs on every Render start) moves the demo accounts to the new domain and keeps all history. Demo addresses never receive email.
+
+Institutional sign-in also needs the OIDC settings in `.env`. The demo login uses `VOTRIA_DEMO_MODE` and `VOTRIA_DEMO_ACCESS_PASSWORD`. Never commit secrets.
 
 ## Validation
 

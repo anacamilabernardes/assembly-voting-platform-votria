@@ -14,6 +14,10 @@ services:
         value: "true"
       - key: VOTRIA_DEMO_ACCESS_PASSWORD
         sync: false
+      - key: VOTRIA_INSTITUTION_NAME
+        sync: false
+      - key: VOTRIA_ALLOWED_EMAIL_DOMAIN
+        sync: false
       - key: DJANGO_SECRET_KEY
         generateValue: true
       - key: DATABASE_URL

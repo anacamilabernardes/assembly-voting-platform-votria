@@ -1,4 +1,4 @@
-import os, secrets
+import os, re, secrets
 from pathlib import Path
 from urllib.parse import urlparse, unquote, parse_qs
 from django.core.exceptions import ImproperlyConfigured
@@ -64,7 +64,11 @@ OIDC_ISSUER = os.getenv('OIDC_ISSUER','')
 OIDC_CLIENT_ID = os.getenv('OIDC_CLIENT_ID','')
 OIDC_CLIENT_SECRET = os.getenv('OIDC_CLIENT_SECRET','')
 OIDC_REQUIRED_ACR = os.getenv('VOTRIA_REQUIRED_ACR','')
+# One institution per deployment: its display name and the email domain every member must use.
+VOTRIA_INSTITUTION_NAME = os.getenv('VOTRIA_INSTITUTION_NAME','').strip()
 VOTRIA_ALLOWED_EMAIL_DOMAIN = os.getenv('VOTRIA_ALLOWED_EMAIL_DOMAIN','').strip().lower().lstrip('@')
+if VOTRIA_ALLOWED_EMAIL_DOMAIN and not re.fullmatch(r'(?=.{4,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z][a-z0-9-]{1,62}', VOTRIA_ALLOWED_EMAIL_DOMAIN):
+    raise ImproperlyConfigured('VOTRIA_ALLOWED_EMAIL_DOMAIN must be a single domain such as example.org.')
 OIDC_REDIRECT_URI = os.getenv('OIDC_REDIRECT_URI','')
 
 CSRF_TRUSTED_ORIGINS = os.getenv('DJANGO_CSRF_TRUSTED_ORIGINS', 'http://127.0.0.1:5173,http://localhost:5173' if DEBUG else '').split(',') if DEBUG or os.getenv('DJANGO_CSRF_TRUSTED_ORIGINS') else []
