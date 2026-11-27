@@ -1,0 +1,33 @@
+services:
+  - type: web
+    name: votria-assembleia-demo
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health/ready
+    envVars:
+      - key: DJANGO_DEBUG
+        value: "false"
+      - key: VOTRIA_DEMO_MODE
+        value: "true"
+      - key: VOTRIA_DEMO_ACCESS_PASSWORD
+        sync: false
+      - key: VOTRIA_INSTITUTION_NAME
+        sync: false
+      - key: VOTRIA_ALLOWED_EMAIL_DOMAIN
+        sync: false
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: votria-assembleia-demo-db
+          property: connectionString
+databases:
+  - name: votria-assembleia-demo-db
+    plan: free
+    region: oregon
+    databaseName: votria_demo
+    user: votria_demo
+    ipAllowList: []

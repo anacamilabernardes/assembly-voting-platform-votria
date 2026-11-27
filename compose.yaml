@@ -1,0 +1,34 @@
+name: votria-assembleia-dev
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: votria
+      POSTGRES_USER: votria
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD no ambiente}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U votria -d votria"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  backend:
+    build: ./backend
+    environment:
+      DJANGO_DEBUG: "true"
+      VOTRIA_DEMO_MODE: "true"
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?Defina DJANGO_SECRET_KEY no ambiente}
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: votria
+      POSTGRES_USER: votria
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1,backend
+    command: ["sh","-c","python manage.py migrate && python manage.py seed_demo && gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3"]
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+volumes:
+  postgres_data:
