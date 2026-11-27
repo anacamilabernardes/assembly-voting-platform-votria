@@ -1,60 +1,60 @@
-# Mensa Assembleia
+# Votria
 
-Primeiro incremento funcional, baseado no [PRD](../PRD_Mensa_Assembleia.md). O módulo de governança usa Django e React e mantém integração com Meet/Docs separada da apuração. Todo dado de demonstração é fictício.
+First functional increment of the assembly voting platform. The governance module uses Django and React and keeps meeting and document integrations separate from vote counting. All demo data is fictional.
 
-## Publicar um simulado online
+## Publish an online demo
 
-Siga o [roteiro do Render](docs/RENDER.md). O arquivo render.yaml cria uma aplicação única com interface, servidor e PostgreSQL. O simulado online exige uma senha de acesso e mantém DEBUG=false, HTTPS e uso oficial bloqueado.
+Follow the [Render guide](docs/RENDER.md). The `render.yaml` file creates one application with an interface, server, and PostgreSQL database. The online demo requires an access password, keeps DEBUG=false, uses HTTPS, and blocks official use.
 
-## Executar localmente
+## Run locally
 
-Python 3.12 ou 3.13, Node compatível com Vite 7 e pnpm 11.
+Requirements: Python 3.12 or 3.13, a Node.js version compatible with Vite 7, and pnpm 11.
 
-1. Criar ambiente Python: `python -m venv .venv`.
-2. Instalar: `.venv/Scripts/python.exe -m pip install -r backend/requirements.txt` (Windows) ou `.venv/bin/python -m pip install -r backend/requirements.txt` (Linux).
-3. Aplicar migrations e dados fictícios: `python backend/manage.py migrate` e `python backend/manage.py seed_demo`, usando o Python do ambiente.
-4. Iniciar backend: `python backend/manage.py runserver 127.0.0.1:8000 --noreload`.
-5. Em `frontend`, executar `pnpm install --frozen-lockfile` e `pnpm dev`.
-6. Abrir http://127.0.0.1:5173.
+1. Create a Python environment: `python -m venv .venv`.
+2. Install dependencies: `.venv/Scripts/python.exe -m pip install -r backend/requirements.txt` (Windows) or `.venv/bin/python -m pip install -r backend/requirements.txt` (Linux).
+3. Apply migrations and load fictional data: `python backend/manage.py migrate` and `python backend/manage.py seed_demo`, using the environment's Python.
+4. Start the backend: `python backend/manage.py runserver 127.0.0.1:8000 --noreload`.
+5. In `frontend`, run `pnpm install --frozen-lockfile` and `pnpm dev`.
+6. Open http://127.0.0.1:5173.
 
-O seed é idempotente e não apaga histórico. Após encerrar, Ana Presidente pode clicar em **Iniciar novo simulado**. O grupo recebe uma nova assembleia com os mesmos perfis e pautas, sem votos, presença ou procurações do teste anterior.
+Seeding is idempotent and does not delete history. After a demo ends, the chair can start a new one. The group receives a new meeting with the same profiles and agenda items, but without votes, attendance, or proxy authorizations from the previous test.
 
-Opcional: `docker compose up --build` cria backend e PostgreSQL de desenvolvimento; definir previamente DJANGO_SECRET_KEY e POSTGRES_PASSWORD com valores aleatórios. O frontend continua iniciado separadamente. Este compose ainda precisa ser validado em ambiente com Docker e não é implantação de produção.
+Optional: `docker compose up --build` starts the development backend and PostgreSQL. Set random values for DJANGO_SECRET_KEY and POSTGRES_PASSWORD first. The frontend must still be started separately. This compose setup has not yet been validated in a Docker environment and is not a production deployment.
 
-## Roteiro para experimentar
+## Demo walkthrough
 
-- Entrar como Carla, criar uma procuração para Diego e consultar o código na própria caixa de teste.
-- Trocar para Diego, confirmar presença e aceitar o código recebido. Trocar de pessoa encerra presença da sessão anterior.
-- Repetir com Elisa para verificar o limite de duas procurações. Uma terceira aceitação é recusada.
-- Entrar como Ana, confirmar presença e instalar em segunda convocação. A primeira exige cinco presenças próprias no colégio fictício de sete.
-- Abrir uma pauta ordinária. Votar, pedir a palavra e experimentar a cédula de representante em sessões distintas.
-- Antes de instalação, preparar todas as procurações necessárias; após instalação a emissão e a aceitação ficam bloqueadas.
-- Encerrar votação para revelar resultado e votos nominais. O placar permanece oculto antes disso.
-- Finalizar assembleia e baixar a minuta estruturada de teste.
-- A matéria especial permanece bloqueada, sem regra estatutária cadastrada.
+- Sign in as Carla, create a proxy authorization for Diego, and retrieve the code from Carla's test inbox.
+- Switch to Diego, confirm attendance, and accept the code. Switching profiles ends attendance for the previous session.
+- Repeat with Elisa to check the two-proxy limit. A third acceptance is rejected.
+- Sign in as Ana, confirm attendance, and install the meeting in the second call. The first call requires five personally present participants out of the fictional group of seven.
+- Open an ordinary agenda item. Vote, request to speak, and try the representative ballot in separate sessions.
+- Prepare all required proxy authorizations before installation; issuing or accepting them is blocked after installation.
+- Close voting to reveal the result and roll-call votes. The tally stays hidden until then.
+- Finalize the meeting and download the structured draft minutes.
+- The special motion remains blocked because no statutory rule has been configured.
 
-Para vários participantes simultâneos, usar perfis de navegador isolados. Múltiplas abas do mesmo perfil compartilham identidade e contam como uma pessoa.
+For multiple simultaneous participants, use isolated browser profiles. Multiple tabs in the same profile share one identity and count as one person.
 
-## Implementado
+## Implemented
 
-Persistência e migrations; snapshot fictício; autenticação por sessão com CSRF; validação de domínio; preparação do login OIDC institucional com vínculo issuer/sub e ACR MFA; presença expressa de simulação, leases de 60 segundos e intervalos consolidados; primeira/segunda convocação; procuração com token aleatório, HMAC, entrega cifrada em caixa local só ao outorgante, limite de duas, controle de escopo e revogação; prevalência do titular presente; voto próprio ou representado por pauta; cédula única, recibo, retry idempotente e resultado SIM > NÃO; fila normal e questão de ordem; minuta determinística; encadeamento de auditoria e triggers contra alteração de votos/eventos.
+Persistence and migrations; fictional snapshot; session authentication with CSRF; domain validation; institutional OIDC login preparation with issuer/sub binding and MFA ACR; explicit demo attendance, 60-second leases, and consolidated intervals; first and second call; proxy authorization with random token, HMAC, encrypted delivery to a local inbox visible only to the grantor, limit of two, scope control, and revocation; precedence of a present principal; own or representative vote by agenda item; single ballot, receipt, idempotent retry, and YES > NO outcome; regular speaking queue and points of order; deterministic draft minutes; audit chaining and database triggers against vote or event changes.
 
-Confirmações de presença/outorga no simulado são **DEMO_CONFIRMATION**, não WebAuthn nem assinatura avançada. Recibos têm hash interno, ainda sem assinatura institucional. Minuta JSON não é documento registral. Caixa local não envia e-mail real. Nenhuma assembleia oficial pode usar essas substituições: comandos oficiais são bloqueados incondicionalmente.
+Attendance and grantor confirmations in the demo are **DEMO_CONFIRMATION**, not WebAuthn or an advanced signature. Receipts have an internal hash but no institutional signature yet. JSON draft minutes are not a registry document. The local inbox does not send real email. These substitutes must not be used in an official meeting: official-use commands are unconditionally blocked.
 
-## Validação
+## Validation
 
-`python backend/manage.py test governance --verbosity 2` executa testes de autorização, quórum, presença, procuração, voto, prazo, idempotência, integridade, privacidade do placar e bloqueio de uso oficial. `pnpm build` verifica TypeScript e empacotamento React.
+Run `python backend/manage.py test governance --verbosity 2` for authorization, quorum, attendance, proxy authorization, voting, deadlines, idempotency, integrity, tally privacy, and official-use blocking tests. Run `pnpm build` to check TypeScript and bundle the React application.
 
-O banco local SQLite serve apenas para desenvolvimento e testes sequenciais. Locks e desempenho para votação concorrente precisam ser homologados com PostgreSQL. Este incremento usa lock exclusivo por assembleia para correção inicial; não foi homologado para 8.000 usuários. A evolução para barreiras compartilhadas, outbox, gateway WebSocket e jobs está no backlog.
+Local SQLite is intended only for development and sequential tests. Locks and performance for concurrent voting must be validated with PostgreSQL. This increment uses an exclusive lock per meeting as an initial correctness measure; it has not been validated for 8,000 users. Shared barriers, an outbox, a WebSocket gateway, and background jobs are listed in the [backlog](docs/BACKLOG.md).
 
 ## La Suite
 
-Fonte oficial do Meet em `upstream/meet`, sem modificações, com commit registrado em `upstream.lock.json`. A cópia não é incluída no repositório principal; preservar licenças ao distribuir alterações. Meet 1.33.0 exige Python >=3.13 e possui seu próprio ambiente/runtime. Não instalar suas dependências no ambiente Python do módulo de governança.
+The official meeting source is stored in `upstream/meet` without modifications, with its commit recorded in `upstream.lock.json`. The copy is not included in the main repository; preserve its licenses when distributing changes. Meet 1.33.0 requires Python >=3.13 and has its own environment/runtime. Do not install its dependencies into the governance module's Python environment.
 
-O primeiro incremento ainda não executa Meet, LiveKit ou Docs e não emite tokens de mídia. A próxima etapa é criar adaptadores autenticados com o IdP compartilhado, concessão de palco e documento privado; nunca usar URL de sala pública como prova de presença.
+This first increment does not run Meet, LiveKit, or Docs, and does not issue media tokens. The next step is to create authenticated adapters with the shared identity provider, speaker-stage grants, and a private document; never use a public room URL as proof of attendance.
 
-## Bloqueios antes de uso oficial
+## Blockers before official use
 
-Conectar e testar IdP e cadastro reais; WebAuthn e cerimônia de outorga; snapshot aprovado e regras normativas; aprovação dupla da mesa e comandos; motor de matérias especiais; assinatura ICP-Brasil e PDF/A; TSA/WORM e verificador independente; homologação RCPJ; entrega real de e-mail; proteção contra falha sistêmica de presença; pausa/prorrogação/anulação; observabilidade, Kubernetes/DR e CI/CD; testes PostgreSQL de concorrência, acessibilidade, segurança e carga de 8.000.
+Connect and test the real identity provider and member registry; implement WebAuthn and proxy-grant ceremonies; approve the snapshot and normative rules; add dual approval for board actions and commands; implement the special-motion engine; add ICP-Brasil signatures and PDF/A; add TSA/WORM and an independent verifier; validate with the registry; deliver real email; protect against systemic attendance failures; implement pause/extension/annulment; add observability, Kubernetes/disaster recovery, and CI/CD; complete PostgreSQL concurrency, accessibility, security, and 8,000-user load testing.
 
-Não desabilitar o bloqueio de assembleia oficial sem concluir e revisar esses itens. `DEBUG=false` exige segredos e PostgreSQL. O login fictício somente fica disponível online quando MENSA_DEMO_MODE=true e MENSA_DEMO_ACCESS_PASSWORD contém pelo menos 16 caracteres; isso não habilita uso oficial.
+Do not disable the official-meeting block until these items are completed and reviewed. DEBUG=false requires secrets and PostgreSQL. Online fictional sign-in is available only when demo mode is enabled and the demo access password has at least 16 characters; this does not enable official use.
